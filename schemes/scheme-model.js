@@ -1,4 +1,5 @@
-const db = require('../data/schemes.js');
+const db = require('../data/db-config.js');
+const { select } = require('../data/db-config.js');
 
 module.exports = {
   find,
@@ -10,24 +11,24 @@ module.exports = {
 };
 
 function find() {
-  // SELECT * FROM schemes
   return db('schemes');
 }
 
 function findById(id) {
-  // SELECT * FROM schemes
-  // WHERE schemes.id = 4
   return db('schemes').where({ id }).first();
 }
 
-// Not Finished Yet
 function findSteps(id) {
   // SELECT sc.id, sc.scheme_name, st.step_number, st.instructions
   // FROM schemes as sc
   // JOIN steps AS st ON sc.id = st.scheme_id
-  // WHERE sc.id = 3
+  // WHERE sc.id = input ID
   // ORDER BY st.step_number
-  return db('schemes');
+  return db('schemes as sc')
+    .join('steps as st', 'st.scheme_id', 'sc.id')
+    .select('sc.id', 'sc.scheme_name', 'st.step_number', 'st.instructions')
+    .where('sc.id', id)
+    .orderBy('st.step_number');
 }
 
 function add(scheme) {
@@ -47,5 +48,6 @@ function update(changes, id) {
     });
 }
 
-// Not Finished Yet
-function remove(id) {}
+function remove(id) {
+  return db('schemes').where('id', Number(id)).del();
+}
